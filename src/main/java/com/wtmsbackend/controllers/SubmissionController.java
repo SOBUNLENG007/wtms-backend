@@ -8,6 +8,7 @@ import com.wtmsbackend.dto.response.SubmissionResponse;
 import com.wtmsbackend.services.SubmissionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,10 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api/v1/submissions")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Submissions", description = "Endpoints for managing assignment submissions and grading")
 public class SubmissionController {
 
     private final SubmissionService submissionService;
@@ -26,76 +30,140 @@ public class SubmissionController {
     @Operation(summary = "Get all submissions", description = "Retrieves a paginated list of all homework submissions.")
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public ResponseEntity<?> getAllSubmissions(
+    public ResponseEntity<ApiResponse<PagedResponse<SubmissionResponse>>> getAllSubmissions(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Page<SubmissionResponse> submissionPage = submissionService.getAllSubmissions(page, size);
-        return ResponseEntity.ok(ApiResponse.ok("Submissions fetched successfully", buildPagedResponse(submissionPage)));
+
+        ApiResponse<PagedResponse<SubmissionResponse>> response = ApiResponse.<PagedResponse<SubmissionResponse>>builder()
+                .message("Submissions fetched successfully!")
+                .success(true)
+                .payload(buildPagedResponse(submissionPage))
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Get submissions by Assignment", description = "Retrieves all submissions turned in for a specific assignment.")
     @GetMapping("/assignment/{assignmentId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public ResponseEntity<?> getSubmissionsByAssignment(
+    public ResponseEntity<ApiResponse<PagedResponse<SubmissionResponse>>> getSubmissionsByAssignment(
             @PathVariable Integer assignmentId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Page<SubmissionResponse> submissionPage = submissionService.getSubmissionsByAssignment(assignmentId, page, size);
-        return ResponseEntity.ok(ApiResponse.ok("Assignment submissions fetched successfully", buildPagedResponse(submissionPage)));
+
+        ApiResponse<PagedResponse<SubmissionResponse>> response = ApiResponse.<PagedResponse<SubmissionResponse>>builder()
+                .message("Assignment submissions fetched successfully!")
+                .success(true)
+                .payload(buildPagedResponse(submissionPage))
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Get submissions by Employee", description = "Retrieves all submissions made by a specific employee.")
     @GetMapping("/employee/{employeeId}")
-    public ResponseEntity<?> getSubmissionsByEmployee(
+    public ResponseEntity<ApiResponse<PagedResponse<SubmissionResponse>>> getSubmissionsByEmployee(
             @PathVariable Integer employeeId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Page<SubmissionResponse> submissionPage = submissionService.getSubmissionsByEmployee(employeeId, page, size);
-        return ResponseEntity.ok(ApiResponse.ok("Employee submissions fetched successfully", buildPagedResponse(submissionPage)));
+
+        ApiResponse<PagedResponse<SubmissionResponse>> response = ApiResponse.<PagedResponse<SubmissionResponse>>builder()
+                .message("Employee submissions fetched successfully!")
+                .success(true)
+                .payload(buildPagedResponse(submissionPage))
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Get submission by ID", description = "Retrieves specific submission details.")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getSubmissionById(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<SubmissionResponse>> getSubmissionById(@PathVariable Integer id) {
         SubmissionResponse submission = submissionService.getSubmissionById(id);
-        return ResponseEntity.ok(ApiResponse.ok("Submission fetched successfully", submission));
+
+        ApiResponse<SubmissionResponse> response = ApiResponse.<SubmissionResponse>builder()
+                .message("Submission fetched successfully!")
+                .success(true)
+                .payload(submission)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Submit an assignment", description = "Uploads a completed assignment. Available to Employees.")
     @PostMapping
-    public ResponseEntity<?> createSubmission(@Valid @RequestBody SubmissionRequest request) {
+    public ResponseEntity<ApiResponse<SubmissionResponse>> createSubmission(@Valid @RequestBody SubmissionRequest request) {
         SubmissionResponse submission = submissionService.createSubmission(request);
-        return ResponseEntity.ok(ApiResponse.ok("Assignment submitted successfully", submission));
+
+        ApiResponse<SubmissionResponse> response = ApiResponse.<SubmissionResponse>builder()
+                .message("Assignment submitted successfully!")
+                .success(true)
+                .payload(submission)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Update submitted file", description = "Updates the file URL of an existing submission.")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateSubmissionFile(
+    public ResponseEntity<ApiResponse<SubmissionResponse>> updateSubmissionFile(
             @PathVariable Integer id,
             @Valid @RequestBody SubmissionRequest request) {
         SubmissionResponse submission = submissionService.updateSubmissionFile(id, request);
-        return ResponseEntity.ok(ApiResponse.ok("Submission updated successfully", submission));
+
+        ApiResponse<SubmissionResponse> response = ApiResponse.<SubmissionResponse>builder()
+                .message("Submission updated successfully!")
+                .success(true)
+                .payload(submission)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Grade a submission", description = "Allows a Trainer or Admin to grade and leave feedback on a submission.")
     @PutMapping("/{id}/grade")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public ResponseEntity<?> gradeSubmission(
+    public ResponseEntity<ApiResponse<SubmissionResponse>> gradeSubmission(
             @PathVariable Integer id,
             @Valid @RequestBody GradeRequest request) {
         SubmissionResponse submission = submissionService.gradeSubmission(id, request);
-        return ResponseEntity.ok(ApiResponse.ok("Submission graded successfully", submission));
+
+        ApiResponse<SubmissionResponse> response = ApiResponse.<SubmissionResponse>builder()
+                .message("Submission graded successfully!")
+                .success(true)
+                .payload(submission)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Delete a submission", description = "Permanently deletes a submission.")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public ResponseEntity<?> deleteSubmission(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<Void>> deleteSubmission(@PathVariable Integer id) {
         submissionService.deleteSubmission(id);
-        return ResponseEntity.ok(ApiResponse.ok("Submission deleted successfully", null));
+
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .message("Submission deleted successfully!")
+                .success(true)
+                .payload(null)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     private PagedResponse<SubmissionResponse> buildPagedResponse(Page<SubmissionResponse> page) {
