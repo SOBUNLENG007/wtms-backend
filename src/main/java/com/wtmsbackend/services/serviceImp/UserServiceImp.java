@@ -97,22 +97,27 @@ public class UserServiceImp implements UserService {
         user.setStatus(false);
         userRepository.save(user);
     }
-
-    @Override
-    public void adminResetPassword(Integer id, String newPassword) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
-
-        // Hash the new password and save
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-    }
+//
+//    @Override
+//    public void adminResetPassword(Integer id, String newPassword) {
+//        User user = userRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+//
+//        // Hash the new password and save
+//        user.setPassword(passwordEncoder.encode(newPassword));
+//        userRepository.save(user);
+//    }
 
     @Override
     public Page<UserResponse> getUsersByDepartment(Integer departmentId, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<User> usersPage = userRepository.findByDepartmentId(departmentId, pageRequest);
         return usersPage.map(this::mapToUserResponse);
+    }
+
+    @Override
+    public void userResetPassword(String newPassword, String oldPassword, String newPassword1) {
+
     }
 
     private UserResponse mapToUserResponse(User user) {

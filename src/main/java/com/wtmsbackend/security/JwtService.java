@@ -41,6 +41,11 @@ public class JwtService {
         return buildToken(new HashMap<>(), userDetails, 1000 * 60 * 60 * 24 * 7); // 7 Days Expiration
     }
 
+    // --- NEW: 1 Hour Token specifically for Password Resets ---
+    public String generatePasswordResetToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, 1000 * 60 * 60); // 1 Hour Expiration
+    }
+
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
         return Jwts.builder()
                 .setClaims(extraClaims)

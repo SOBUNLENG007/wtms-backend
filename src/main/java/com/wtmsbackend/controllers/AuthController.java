@@ -75,10 +75,9 @@ public class AuthController {
 
     @PutMapping("/forget-password")
     public ResponseEntity<?> forgetPassword(
-            @RequestParam @NotBlank @Email String email,
-            @Valid @RequestBody ForgetPasswordRequest request) {
+            @RequestParam @NotBlank @Email String email) {
 
-        authService.forgetPassword(email, request);
+        authService.forgetPassword(email);
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .message("Password was changed successfully")
                 .success(true)
@@ -86,4 +85,6 @@ public class AuthController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+
 }

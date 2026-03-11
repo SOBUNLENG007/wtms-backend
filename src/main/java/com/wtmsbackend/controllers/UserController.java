@@ -171,12 +171,13 @@ public class UserController {
             description = "Allows an Admin to directly override and reset a specific user's password using their ID. Restricted to ADMIN role."
     )
     @PutMapping("/{id}/reset-password")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> adminResetPassword(
-            @PathVariable Integer id,
-            @Valid @RequestBody com.wtmsbackend.dto.request.AdminResetPasswordRequest request) {
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> userResetPassword(
+            String newPassword,
+            String oldPassword,
+            @Valid @RequestBody com.wtmsbackend.dto.request.UserResetPasswordRequest request) {
 
-        userService.adminResetPassword(id, request.getNewPassword());
+        userService.userResetPassword(newPassword, oldPassword, request.getNewPassword());
 
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .message("User password reset successfully by Admin")

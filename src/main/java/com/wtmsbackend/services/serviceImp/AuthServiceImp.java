@@ -5,9 +5,11 @@ import com.wtmsbackend.dto.request.LoginRequest;
 import com.wtmsbackend.dto.request.UserRequest;
 import com.wtmsbackend.dto.response.LoginResponse;
 import com.wtmsbackend.dto.response.UserResponse;
+import com.wtmsbackend.models.Department;
 import com.wtmsbackend.models.Otp;
 import com.wtmsbackend.models.User;
 import com.wtmsbackend.models.role.Role;
+import com.wtmsbackend.repositories.DepartmentRepository;
 import com.wtmsbackend.repositories.OtpRepository;
 import com.wtmsbackend.repositories.UserRepository;
 import com.wtmsbackend.security.JwtService;
@@ -27,6 +29,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class AuthServiceImp implements AuthService {
 
+    private final DepartmentRepository departmentRepository;
+
     private final UserRepository userRepository;
     private final OtpRepository otpRepository;       // Added: needed for OTP operations
     private final EmailService emailService;         // Added: needed to send emails
@@ -34,24 +38,29 @@ public class AuthServiceImp implements AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    @Override
     public UserResponse register(UserRequest userRequest) {
+
         if (userRepository.existsByEmail(userRequest.getEmail())) {
             throw new RuntimeException("Email already exists!");
         }
+
+        Department department = departmentRepository.findById(userRequest.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException("Department not found"));
 
         User user = User.builder()
                 .firstName(userRequest.getFirstName())
                 .lastName(userRequest.getLastName())
                 .email(userRequest.getEmail())
-                .password(passwordEncoder.encode(userRequest.getPassword())) // Hashed password
+                .password(passwordEncoder.encode(userRequest.getPassword()))
                 .phoneNumber(userRequest.getPhoneNumber())
                 .address(userRequest.getAddress())
-                .role(Role.USER) // Default role
+                .role(Role.USER)
+                .department(department)   // ✅ SET DEPARTMENT
                 .build();
 
-        userRepository.save(user);
-        return mapToUserResponse(user);
+        User savedUser = userRepository.save(user);
+
+        return mapToUserResponse(savedUser);
     }
 
     @Override
@@ -127,7 +136,7 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public void forgetPassword(String email, ForgetPasswordRequest request) {
+    public void forgetPassword(String email) {
         // 1. Find user
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -141,7 +150,6 @@ public class AuthServiceImp implements AuthService {
         }
 
         // 3. Encode the new password and update the user
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
         // 4. Delete the OTP so they can't reuse it to reset the password again
@@ -157,6 +165,9 @@ public class AuthServiceImp implements AuthService {
                 .email(user.getEmail())
                 .PhoneNumber(user.getPhoneNumber()) // Note: Changed to lowercase 'p' to match standard naming conventions
                 .address(user.getAddress())
+                .status(user.getStatus())
+                .departmentId(user.getDepartment().getId())
+                .departmentName(user.getDepartment().getName())
                 .build();
     }
 }

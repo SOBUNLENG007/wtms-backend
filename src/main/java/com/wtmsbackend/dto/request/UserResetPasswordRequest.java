@@ -5,7 +5,15 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
-public class AdminResetPasswordRequest {
+public class UserResetPasswordRequest {
+
+
+    @NotBlank(message = "Old password is required")
+    @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+            message = "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters"
+    )
+    private String oldPassword;
 
     @NotBlank(message = "New password is required")
     @Pattern(
@@ -13,4 +21,7 @@ public class AdminResetPasswordRequest {
             message = "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters"
     )
     private String newPassword;
+
+
+
 }

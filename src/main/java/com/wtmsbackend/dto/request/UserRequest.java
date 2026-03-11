@@ -10,14 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserRequest {
 
-    // Removed @NotNull because @NotBlank automatically checks for null AND empty strings
     @NotBlank(message = "First name is required")
-    @Size(max = 120, message = "First name cannot exceed 120 characters") // Matches your DB VARCHAR(120)
+    @Size(max = 120, message = "First name cannot exceed 120 characters")
     @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "First name must contain only letters and spaces")
     private String firstName;
 
     @NotBlank(message = "Last name is required")
-    @Size(max = 120, message = "Last name cannot exceed 120 characters") // Matches your DB VARCHAR(120)
+    @Size(max = 120, message = "Last name cannot exceed 120 characters")
     @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Last name must contain only letters and spaces")
     private String lastName;
 
