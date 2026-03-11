@@ -13,7 +13,9 @@ public class AssignmentResponse {
     private String description;
     private LocalDateTime deadline;
     private Integer totalScore;
-//    private Integer sessionId;
+    private Integer sessionId;
     private String sessionTitle;
     private LocalDateTime createdAt;
+
+//    Principal principal;
 }
